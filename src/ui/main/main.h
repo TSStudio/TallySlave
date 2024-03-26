@@ -27,6 +27,7 @@ struct ui_main_ui_entry {
     void handleUpdate();
 };
 
+void ui_main_handle_update(ui_main_ui_entry* ui_entry);
 ui_main_ui_entry* setup_ui_main_screen();
 
 #endif

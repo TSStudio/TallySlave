@@ -41,6 +41,10 @@ lv_color_t ui_main_args::getSignalTypeColor() {
     return lv_color_make(0x00, 0xcc, 0x00);
 }
 
+void ui_main_handle_update(ui_main_ui_entry* ui_entry) {
+    ui_entry->handleUpdate();
+}
+
 void ui_main_ui_entry::handleUpdate() {
     if (memcmp(this->args, this->lastdrew_args, sizeof(ui_main_args)) == 0) {
         return;
