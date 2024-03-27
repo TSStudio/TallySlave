@@ -5,6 +5,7 @@
 #include <SPI.h>
 #include "screen/screen_port.h"
 #include "ui/ui_all.h"
+#include "network/wifi/wifi.h"
 
 //High bit -> Low bit
 //ROW0COL0(2^11) ROW0COL1 ROW0COL2
@@ -36,6 +37,8 @@ void setup() {
     lv_log_register_print_cb(my_printf);
     setup_screen();
 
+    initWifiInstance("307", "306306306306", "192.168.5.9");
+
     static screen_co screen_main, screen_conmenu;
 
     ui_main = setup_ui_main_screen();
@@ -57,18 +60,22 @@ void setup() {
 
 void loop() {
     if (cycle % 300 == 0) {
-        Serial.printf("Cycle: %d\n", cycle);
-        ui_conmenu.selected = (ui_conmenu.selected + 1) % ui_conmenu.selection_count;
+        doWifiStuff(ui_main->args->signaldBm, ui_main->args->preview_device_id, ui_main->args->program_device_id, ui_main->args->signalState);
+        if (strcmp(ui_main->args->program_device_id, ui_main->args->current_device_id) == 0) {
+            ui_main->args->state = 2;
+        } else if (strcmp(ui_main->args->preview_device_id, ui_main->args->current_device_id) == 0) {
+            ui_main->args->state = 1;
+        } else {
+            ui_main->args->state = 0;
+        }
+        //ui_conmenu.selected = (ui_conmenu.selected + 1) % ui_conmenu.selection_count;
     }
     if (cycle % 5000 == 0) {
-        screen = !screen;
+        //screen = !screen;
     }
     if (micros() < last_refresh_time_us || micros() - last_refresh_time_us >= targeted_frame_time_us) {
-        if (micros() > last_refresh_time_us && micros() - last_refresh_time_us >= 2 * targeted_frame_time_us) {
+        if (micros() > last_refresh_time_us && micros() - last_refresh_time_us >= 10 * targeted_frame_time_us) {
             Serial.printf("Frame time exceeded: %d\n", micros() - last_refresh_time_us);
-        }
-        if (cycle % 10 == 0) {
-            Serial.printf("Cycle: %d, last refresh took %d ms\n", cycle, (micros() - last_refresh_time_us) / 1000);
         }
         last_refresh_time_us = micros();
         refresh_screen();

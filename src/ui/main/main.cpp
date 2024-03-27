@@ -2,13 +2,16 @@
 
 void ui_main_args::init() {
     voltage = 0.0;
-    current_device_id = "A01";
-    preview_device_id = "B01";
-    program_device_id = "A02";
+    current_device_id = (char*)malloc(4);
+    preview_device_id = (char*)malloc(4);
+    program_device_id = (char*)malloc(4);
+    strcpy(current_device_id, "A01");
+    strcpy(preview_device_id, "000");
+    strcpy(program_device_id, "000");
     signaldBm = -10;
     signalType = 1;
-    signalState = 2;
-    state = 2;
+    signalState = 0;
+    state = 0;
 }
 char* ui_main_args::getSignalTypeString() {
     switch (this->signalType) {
@@ -46,9 +49,8 @@ void ui_main_handle_update(ui_main_ui_entry* ui_entry) {
 }
 
 void ui_main_ui_entry::handleUpdate() {
-    if (memcmp(this->args, this->lastdrew_args, sizeof(ui_main_args)) == 0) {
-        return;
-    }
+    if (strcmp(this->args->current_device_id, this->lastdrew_args->current_device_id) == 0 && strcmp(this->args->preview_device_id, this->lastdrew_args->preview_device_id) == 0 && strcmp(this->args->program_device_id, this->lastdrew_args->program_device_id) == 0)
+        if (this->args->voltage == this->lastdrew_args->voltage && this->args->signaldBm == this->lastdrew_args->signaldBm && this->args->signalType == this->lastdrew_args->signalType && this->args->signalState == this->lastdrew_args->signalState && this->args->state == this->lastdrew_args->state) return;
     char voltage[10];
     sprintf(voltage, "DC %.1fV", this->args->voltage);
     lv_label_set_text(this->objs->label_Voltage, voltage);
@@ -74,7 +76,16 @@ void ui_main_ui_entry::handleUpdate() {
         lv_label_set_text(this->objs->label_currentState, "PROGRAM");
     }
     lv_style_set_text_color(this->objs->style_wifi, this->args->getSignalTypeColor());
+    free(this->lastdrew_args->current_device_id);
+    free(this->lastdrew_args->preview_device_id);
+    free(this->lastdrew_args->program_device_id);
     memcpy(this->lastdrew_args, this->args, sizeof(ui_main_args));
+    this->lastdrew_args->current_device_id = (char*)malloc(4);
+    this->lastdrew_args->preview_device_id = (char*)malloc(4);
+    this->lastdrew_args->program_device_id = (char*)malloc(4);
+    strcpy(this->lastdrew_args->current_device_id, this->args->current_device_id);
+    strcpy(this->lastdrew_args->preview_device_id, this->args->preview_device_id);
+    strcpy(this->lastdrew_args->program_device_id, this->args->program_device_id);
 }
 
 ui_main_ui_entry* setup_ui_main_screen() {
@@ -179,6 +190,11 @@ ui_main_ui_entry* setup_ui_main_screen() {
     lv_obj_add_style(ui_entry->objs->label_ProgramDeviceID, &style_PGM, 0);
     lv_label_set_text(ui_entry->objs->label_ProgramDeviceID, "A02");
     lv_obj_align(ui_entry->objs->label_ProgramDeviceID, LV_ALIGN_TOP_LEFT, 124, 105);
+
+    memcpy(ui_entry->lastdrew_args, ui_entry->args, sizeof(ui_main_args));
+    ui_entry->lastdrew_args->current_device_id = (char*)malloc(4);
+    ui_entry->lastdrew_args->preview_device_id = (char*)malloc(4);
+    ui_entry->lastdrew_args->program_device_id = (char*)malloc(4);
 
     return ui_entry;
 }
