@@ -15,10 +15,38 @@ unsigned int last_heartbeat_time;
 
 WiFiClient client;
 
+bool validate_data(char* data) {
+    //0-2 PVW/PGM
+    //3-5 whatever
+    //6 \x03
+    //7-9 whatever
+    //10 \x04
+
+    if (data[6] != 3 || data[10] != 4) {
+        return false;
+    }
+    if (data[0] == 'P' && data[1] == 'V' && data[2] == 'W') {
+        return true;
+    }
+    if (data[0] == 'P' && data[1] == 'G' && data[2] == 'M') {
+        return true;
+    }
+    return false;
+}
+
+bool cmp_networkID(char* a, char* b) {
+    for (int i = 0; i < 3; i++) {
+        if (a[i] != b[i]) {
+            return false;
+        }
+    }
+    return true;
+}
+
 void sendHeartbeat() {
     Serial.println("Sending heartbeat...");
     if (client.connected()) {
-        client.write("HEARTBEAT", 9);
+        client.write("HEARTBEAT\0", 10);
         client.flush();
     }
 }
@@ -32,7 +60,7 @@ void initWifiInstance(char* ssid, char* password, char* server) {
     reconnect_tcp_retry = 0;
 }
 
-void doWifiStuff(int& rssi_to_write, char* PVW_to_write, char* PGM_to_write, int& signal_state) {
+void doWifiStuff(int& rssi_to_write, char* PVW_to_write, char* PGM_to_write, int& signal_state, char* networkID) {
     if (WiFi.status() != WL_CONNECTED) {
         signal_state = 0;
     }
@@ -104,14 +132,23 @@ void doWifiStuff(int& rssi_to_write, char* PVW_to_write, char* PGM_to_write, int
     if (!datas) return;
     for (int k = 0; k < datas; ++k) {
         int dataBegin = dataBegins[k];
-        if (len - dataBegin < 6) return;
+        if (len - dataBegin < 11) return;
+        if (!validate_data(buffer + dataBegin)) {
+            continue;
+        }
         if (buffer[dataBegin] == 'P' && buffer[dataBegin + 1] == 'V' && buffer[dataBegin + 2] == 'W') {
+            if (!cmp_networkID(networkID, buffer + dataBegin + 7)) {
+                continue;
+            }
             Serial.println("Reading PVW data...");
             for (int i = 0; i < 3; i++) {
                 PVW_to_write[i] = buffer[dataBegin + 3 + i];
             }
         }
         if (buffer[dataBegin] == 'P' && buffer[dataBegin + 1] == 'G' && buffer[dataBegin + 2] == 'M') {
+            if (!cmp_networkID(networkID, buffer + dataBegin + 7)) {
+                continue;
+            }
             Serial.println("Reading PGM data...");
             for (int i = 0; i < 3; i++) {
                 PGM_to_write[i] = buffer[dataBegin + 3 + i];

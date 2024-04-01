@@ -6,6 +6,7 @@
 #include "screen/screen_port.h"
 #include "ui/ui_all.h"
 #include "network/wifi/wifi.h"
+#include "config/config.h"
 
 //High bit -> Low bit
 //ROW0COL0(2^11) ROW0COL1 ROW0COL2
@@ -20,8 +21,7 @@ unsigned int last_refresh_time_us = 0;
 
 std::map<unsigned int, screen_co> screens;
 
-const int key_rows[] = {KEY_R0_PIN, KEY_R1_PIN, KEY_R2_PIN, KEY_R3_PIN};
-const int key_cols[] = {KEY_C0_PIN, KEY_C1_PIN, KEY_C2_PIN};
+Configuration config;
 
 unsigned long cycle = 0;
 
@@ -37,7 +37,7 @@ void setup() {
     lv_log_register_print_cb(my_printf);
     setup_screen();
 
-    initWifiInstance("307", "306306306306", "192.168.5.9");
+    initWifiInstance("307", "306306306306", "192.168.5.9");  //DEBUG ONLY
 
     static screen_co screen_main, screen_conmenu;
 
@@ -48,6 +48,10 @@ void setup() {
     screen_main.type = 1;
     screen_main.ui_obj_ptr = ui_main;
     screens[0] = screen_main;
+
+    config.initFromEEPROM();
+    free(ui_main->args->current_device_id);
+    ui_main->args->current_device_id = config.deviceID;
 
     ui_conmenu = setup_ui_conmenu_screen(screen);
     screen_conmenu.screen_obj = ui_conmenu.scr;
@@ -60,7 +64,7 @@ void setup() {
 
 void loop() {
     if (cycle % 300 == 0) {
-        doWifiStuff(ui_main->args->signaldBm, ui_main->args->preview_device_id, ui_main->args->program_device_id, ui_main->args->signalState);
+        doWifiStuff(ui_main->args->signaldBm, ui_main->args->preview_device_id, ui_main->args->program_device_id, ui_main->args->signalState, config.networkID);
         if (strcmp(ui_main->args->program_device_id, ui_main->args->current_device_id) == 0) {
             ui_main->args->state = 2;
         } else if (strcmp(ui_main->args->preview_device_id, ui_main->args->current_device_id) == 0) {
