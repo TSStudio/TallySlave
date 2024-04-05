@@ -1,9 +1,13 @@
 #include "menu.h"
 
-UI_GenericMenu_Selection GM_make_selection(char* text, bool isUsing) {
+extern std::map<unsigned int, void (*)()> screen_builders;
+
+UI_GenericMenu_Selection GM_make_selection(char* text, bool isUsing, int clickScreen, UI_Selection_Callback callback) {
     UI_GenericMenu_Selection selection;
     selection.text = text;
     selection.isUsing = isUsing;
+    selection.clickScreen = clickScreen;
+    selection.callback = callback;
     return selection;
 }
 
@@ -29,6 +33,27 @@ void UI_GenericMenu::handleUpdate(bool forceUpdate) {
     lv_obj_remove_style(this->labels_selection[this->selected], this->style_plain, 0);
     lv_obj_add_style(this->labels_selection[this->selected], this->style_selected, 0);
     this->selected_prev = this->selected;
+}
+
+void UI_GenericMenu::handleSelectionChange(int delta) {
+    //if (this->selected < 0) this->selected = this->selection_count - 1;
+    if (delta < 0 && (this->selected < (-delta))) {
+        this->selected = this->selection_count - 1;
+        return;
+    }
+    this->selected += delta;
+    if (this->selected >= this->selection_count) this->selected = 0;
+}
+
+void UI_GenericMenu::handleClick() {
+    if (this->selections[this->selected].clickScreen == 0) {
+        if (this->selections[this->selected].callback != NULL)
+            this->selections[this->selected].callback();
+
+    } else {
+        screen_builders[this->selections[this->selected].clickScreen]();
+        *this->screen_in_display = this->selections[this->selected].clickScreen;
+    }
 }
 
 void UI_GenericMenu::handleBack() {

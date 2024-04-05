@@ -60,6 +60,16 @@ void initWifiInstance(char* ssid, char* password, char* server) {
     reconnect_tcp_retry = 0;
 }
 
+void initWifiInstance(char* ssid, char* password, uint32_t server) {
+    WiFi.setHostname("T-TALLY-PROTOTYPE");
+    WiFi.begin(ssid, password);
+    server_addr = (char*)malloc(16);
+    sprintf(server_addr, "%d.%d.%d.%d", (server >> 24) & 0xFF, (server >> 16) & 0xFF, (server >> 8) & 0xFF, server & 0xFF);
+    reconnect_retry = 0;
+    last_retry_time = millis();
+    reconnect_tcp_retry = 0;
+}
+
 void doWifiStuff(int& rssi_to_write, char* PVW_to_write, char* PGM_to_write, int& signal_state, char* networkID) {
     if (WiFi.status() != WL_CONNECTED) {
         signal_state = 0;
@@ -138,6 +148,15 @@ void doWifiStuff(int& rssi_to_write, char* PVW_to_write, char* PGM_to_write, int
         }
         if (buffer[dataBegin] == 'P' && buffer[dataBegin + 1] == 'V' && buffer[dataBegin + 2] == 'W') {
             if (!cmp_networkID(networkID, buffer + dataBegin + 7)) {
+                Serial.println("Network ID mismatch, expected: ");
+                for (int i = 0; i < 3; i++) {
+                    Serial.printf("%d ", networkID[i]);
+                }
+                Serial.println();
+                Serial.println("Got: ");
+                for (int i = 0; i < 3; i++) {
+                    Serial.printf("%d ", buffer[dataBegin + 7 + i]);
+                }
                 continue;
             }
             Serial.println("Reading PVW data...");

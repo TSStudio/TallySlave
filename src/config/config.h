@@ -7,11 +7,11 @@ class Configuration {
 public:
     char* wifiSSID;
     char* wifiPassword;
-    unsigned int serverIP;
-    unsigned int subnetMask;
-    unsigned int gatewayIP;
-    unsigned int dnsIP;  // NO
-    unsigned int serverPort;
+    uint32_t serverIP;
+    uint32_t subnetMask;
+    uint32_t gatewayIP;
+    uint32_t dnsIP;  // NO
+    uint32_t serverPort;
     char* networkID;
     char* deviceID;
     unsigned char interface_type;

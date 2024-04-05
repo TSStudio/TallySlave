@@ -7,12 +7,7 @@
 #include "ui/ui_all.h"
 #include "network/wifi/wifi.h"
 #include "config/config.h"
-
-//High bit -> Low bit
-//ROW0COL0(2^11) ROW0COL1 ROW0COL2
-//...
-//ROW3COL0 ROW3COL1 ROW3COL2(2^0)
-unsigned int keys_last = 0, keys_now = 0, newly_pressed = 0, newly_released = 0;
+#include "keys/keys.h"
 
 unsigned int current_screen = 9999999;
 unsigned int screen = 0;
@@ -23,21 +18,61 @@ std::map<unsigned int, screen_co> screens;
 
 Configuration config;
 
-unsigned long cycle = 0;
+unsigned long cycle0 = 0, cycle1 = 0;
 
-ui_main_ui_entry *ui_main;
+ui_main_ui_entry* ui_main;
 
 UI_GenericMenu ui_conmenu;
 
-void my_printf(lv_log_level_t level, const char *file) {
-    Serial.printf("level:%d, %s\n", level, file);
+TaskHandle_t obstructIOsTaskHandle, nonObstructIOsTaskHandle;
+
+void obstructIOs(void* parameter) {
+    Serial.print("ObstructIO running on core ");
+    Serial.println(xPortGetCoreID());
+    for (;;) {
+        if (cycle0 % 3000 == 0) {
+            doWifiStuff(ui_main->args->signaldBm, ui_main->args->preview_device_id, ui_main->args->program_device_id, ui_main->args->signalState, config.networkID);
+            if (strcmp(ui_main->args->program_device_id, ui_main->args->current_device_id) == 0) {
+                digitalWrite(LED_R_PIN, HIGH);
+                digitalWrite(LED_G_PIN, LOW);
+                ui_main->args->state = 2;
+            } else if (strcmp(ui_main->args->preview_device_id, ui_main->args->current_device_id) == 0) {
+                digitalWrite(LED_R_PIN, LOW);
+                digitalWrite(LED_G_PIN, HIGH);
+                ui_main->args->state = 1;
+            } else {
+                digitalWrite(LED_R_PIN, LOW);
+                digitalWrite(LED_G_PIN, LOW);
+                ui_main->args->state = 0;
+            }
+            //ui_conmenu.selected = (ui_conmenu.selected + 1) % ui_conmenu.selection_count;
+        }
+        cycle0++;
+    }
 }
+
+void nonObstructIOs(void* parameter) {
+    Serial.print("nonObstructIO running on core ");
+    Serial.println(xPortGetCoreID());
+    for (;;) {
+        if (micros() < last_refresh_time_us || micros() - last_refresh_time_us >= targeted_frame_time_us) {
+            if (micros() > last_refresh_time_us && micros() - last_refresh_time_us >= 10 * targeted_frame_time_us) {
+                Serial.printf("Frame time exceeded: %d\n", micros() - last_refresh_time_us);
+            }
+            last_refresh_time_us = micros();
+            refresh_screen();
+        }
+        do_key_stuff();
+    }
+}
+
 void setup() {
     Serial.begin(115200);
-    lv_log_register_print_cb(my_printf);
     setup_screen();
+    setup_keys();
 
     initWifiInstance("307", "306306306306", "192.168.5.9");  //DEBUG ONLY
+    //initWifiInstance(Configuration.wifiSSID, Configuration.wifiPassword, Configuration.serverIP);
 
     static screen_co screen_main, screen_conmenu;
 
@@ -60,31 +95,24 @@ void setup() {
     screen_conmenu.type = 0;
     screen_conmenu.ui_obj_ptr = &ui_conmenu;
     screens[1] = screen_conmenu;
+
+    xTaskCreatePinnedToCore(
+        obstructIOs,
+        "ObstructIO",
+        20000,
+        NULL,
+        1,
+        &obstructIOsTaskHandle,
+        0);
+    delay(100);
+    xTaskCreatePinnedToCore(
+        nonObstructIOs,
+        "NonObstructIO",
+        5000,
+        NULL,
+        1,
+        &nonObstructIOsTaskHandle,
+        1);
 }
 
-void loop() {
-    if (cycle % 300 == 0) {
-        doWifiStuff(ui_main->args->signaldBm, ui_main->args->preview_device_id, ui_main->args->program_device_id, ui_main->args->signalState, config.networkID);
-        if (strcmp(ui_main->args->program_device_id, ui_main->args->current_device_id) == 0) {
-            ui_main->args->state = 2;
-        } else if (strcmp(ui_main->args->preview_device_id, ui_main->args->current_device_id) == 0) {
-            ui_main->args->state = 1;
-        } else {
-            ui_main->args->state = 0;
-        }
-        //ui_conmenu.selected = (ui_conmenu.selected + 1) % ui_conmenu.selection_count;
-    }
-    if (cycle % 5000 == 0) {
-        //screen = !screen;
-    }
-    if (micros() < last_refresh_time_us || micros() - last_refresh_time_us >= targeted_frame_time_us) {
-        if (micros() > last_refresh_time_us && micros() - last_refresh_time_us >= 10 * targeted_frame_time_us) {
-            Serial.printf("Frame time exceeded: %d\n", micros() - last_refresh_time_us);
-        }
-        last_refresh_time_us = micros();
-        refresh_screen();
-    } else {
-        delay(1);
-    }
-    cycle++;
-}
+void loop() {}

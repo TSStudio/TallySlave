@@ -1,6 +1,7 @@
 #include "ui_all.h"
+#include "Arduino.h"
 
-//0: Main, 1:ConMenu, 11:ConMenu-SelectInterface, 21:ConMenu-WifiSettings, 31:ConMenu-NetworkID
+//0: Main, 1:ConMenu, 11:ConMenu-SelectInterface, 12:ConMenu-WifiSettings, 13:ConMenu-NetworkID
 
 extern unsigned int current_screen;
 extern unsigned int screen;
@@ -16,9 +17,16 @@ void screen_co::refresh() {
 
 void refresh_screen() {
     if (current_screen != screen) {
+        Serial.println("Changing screen");
         lv_screen_load(screens[screen].screen_obj);
         current_screen = screen;
     }
     screens[screen].refresh();
     lv_task_handler();
+}
+
+void init_builders() {
+    //screen_builders[i]=[]{};
+    // Ya need to provide a lambda function here
+    // and finally push screen_co to screens
 }

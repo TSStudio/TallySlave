@@ -7,6 +7,8 @@
 
 //0: Main, 1:ConMenu, 11:ConMenu-SelectInterface, 21:ConMenu-WifiSettings, 31:ConMenu-NetworkID
 
+std::map<unsigned int, void (*)()> screen_builders;
+
 struct screen_co {
     lv_obj_t* screen_obj;
     void (*keydown_handle)(uint8_t key);
@@ -18,5 +20,6 @@ struct screen_co {
 };
 
 void refresh_screen();
+void init_builders();
 
 #endif
