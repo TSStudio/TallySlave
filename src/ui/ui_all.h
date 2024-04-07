@@ -6,6 +6,8 @@
 #include "generic_input/input.h"
 #include <Arduino.h>
 #include "../config/config.h"
+#include "../network/utils/ipvalidator.h"
+#include "../network/wifi/wifi.h"
 
 #include "conmenu/conmenu.h"
 #include <map>

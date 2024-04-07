@@ -41,13 +41,13 @@ void init_builders() {
     // Ya need to provide a lambda function here
     // and finally push screen_co to screens
     screen_builders[12] = [] {
-        Serial.println("Building screen 12");
         static char title[] = "Wifi Settings";
-        static char selection1[] = "1";
-        static char selection2[] = "2";
-        static char selection3[] = "3";
-        UI_GenericMenu_Selection* selections = GM_make_selections(3, GM_make_selection(selection1), GM_make_selection(selection2), GM_make_selection(selection3));
-        static UI_GenericMenu menu = GM_make_menu(title, 1, screen, selections, 3);
+        static char selection1[] = "Authentication";
+        static char selection2[] = "Server";
+        static char selection3[] = "Toggle DHCP";
+        static char selection4[] = "IP Manual Settings";
+        UI_GenericMenu_Selection* selections = GM_make_selections(4, GM_make_selection(selection1, false, 121), GM_make_selection(selection2, false, 122), GM_make_selection(selection3, false, 123), GM_make_selection(selection4, false, 124));
+        static UI_GenericMenu menu = GM_make_menu(title, 1, screen, selections, 4);
 
         static screen_co screen_common;
         screen_common.screen_obj = menu.scr;
@@ -55,10 +55,130 @@ void init_builders() {
         screen_common.type = 0;
         screen_common.ui_obj_ptr = &menu;
         screens[12] = screen_common;
-        Serial.println("Screen 12 built");
+    };
+    screen_builders[121] = [] {
+        static char title[] = "Authentication";
+        static char selection1[] = "SSID";
+        static char selection2[] = "Passcode";
+        UI_GenericMenu_Selection* selections = GM_make_selections(2, GM_make_selection(selection1, false, 1211), GM_make_selection(selection2, false, 1212));
+        static UI_GenericMenu menu = GM_make_menu(title, 12, screen, selections, 2);
+
+        static screen_co screen_common;
+        screen_common.screen_obj = menu.scr;
+        screen_common.refresh_handle_t0 = ui_generic_menu_handle_update;
+        screen_common.type = 0;
+        screen_common.ui_obj_ptr = &menu;
+        screens[121] = screen_common;
+    };
+    screen_builders[1211] = [] {
+        static char title[] = "SSID";
+        static char dictionary[] = "1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-_.";
+        static UI_GenericInput input = GI_make_input(
+            title, 121, screen, dictionary, [](char* result) {
+                Serial.println("Saving");
+                Serial.println(result);
+                config.saveWifiSSID(result);
+                do_wifi_cleanup();
+                initWifiInstance(config.wifiSSID, config.wifiPassword, config.serverIP);
+            },
+            15, config.wifiSSID, false);
+        static screen_co screen_common;
+        screen_common.screen_obj = input.scr;
+        screen_common.refresh_handle_t2 = ui_generic_input_handle_update;
+        screen_common.type = 2;
+        screen_common.ui_obj_ptr = &input;
+        screens[1211] = screen_common;
+    };
+    screen_builders[1212] = [] {
+        static char title[] = "Passcode";
+        static char dictionary[] = "1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+        static UI_GenericInput input = GI_make_input(
+            title, 121, screen, dictionary, [](char* result) {
+                Serial.println("Saving");
+                Serial.println(result);
+                config.saveWifiPassword(result);
+                do_wifi_cleanup();
+                initWifiInstance(config.wifiSSID, config.wifiPassword, config.serverIP);
+            },
+            15, config.wifiPassword, false);
+        static screen_co screen_common;
+        screen_common.screen_obj = input.scr;
+        screen_common.refresh_handle_t2 = ui_generic_input_handle_update;
+        screen_common.type = 2;
+        screen_common.ui_obj_ptr = &input;
+        screens[1212] = screen_common;
+    };
+    screen_builders[122] = [] {
+        static char title[] = "Server";
+        static char selection1[] = "Server IP";
+        static char selection2[] = "Server Port";
+        UI_GenericMenu_Selection* selections = GM_make_selections(2, GM_make_selection(selection1, false, 1221), GM_make_selection(selection2, false, 1222));
+        static UI_GenericMenu menu = GM_make_menu(title, 12, screen, selections, 2);
+
+        static screen_co screen_common;
+        screen_common.screen_obj = menu.scr;
+        screen_common.refresh_handle_t0 = ui_generic_menu_handle_update;
+        screen_common.type = 0;
+        screen_common.ui_obj_ptr = &menu;
+        screens[122] = screen_common;
+    };
+    screen_builders[1221] = [] {
+        static char title[] = "Server IP";
+        static char dictionary[] = "1234567890.";
+        char* ip_r = IPConstructor(config.serverIP);
+        static UI_GenericInput input = GI_make_input(
+            title, 122, screen, dictionary, [](char* result) {
+                IPValidatorResult ipResult = IPValidator(result);
+                Serial.println("Saving");
+                if (!ipResult.valid) {
+                    Serial.println("Invalid IP");
+                    return;
+                }
+                Serial.println(ipResult.ip);
+                config.saveServerIP(ipResult.ip);
+                do_wifi_cleanup();
+                initWifiInstance(config.wifiSSID, config.wifiPassword, config.serverIP);
+            },
+            15, ip_r, false);
+        free(ip_r);
+        static screen_co screen_common;
+        screen_common.screen_obj = input.scr;
+        screen_common.refresh_handle_t2 = ui_generic_input_handle_update;
+        screen_common.type = 2;
+        screen_common.ui_obj_ptr = &input;
+        screens[1221] = screen_common;
+    };
+    screen_builders[1222] = [] {
+        static char title[] = "Server Port";
+        static char dictionary[] = "1234567890";
+        char* ip_r = PortConstructor(config.serverPort);
+        static UI_GenericInput input = GI_make_input(
+            title, 122, screen, dictionary, [](char* result) {
+                //trans result to number
+                uint32_t port = 0;
+                for (int i = 0; i < strlen(result); i++) {
+                    port = port * 10 + result[i] - '0';
+                }
+                if (port > 65535) {
+                    Serial.println("Invalid Port");
+                    return;
+                }
+                Serial.println("Saving");
+                Serial.println(port);
+                config.saveServerPort(port);
+                do_wifi_cleanup();
+                initWifiInstance(config.wifiSSID, config.wifiPassword, config.serverIP);
+            },
+            5, ip_r, false);
+        free(ip_r);
+        static screen_co screen_common;
+        screen_common.screen_obj = input.scr;
+        screen_common.refresh_handle_t2 = ui_generic_input_handle_update;
+        screen_common.type = 2;
+        screen_common.ui_obj_ptr = &input;
+        screens[1222] = screen_common;
     };
     screen_builders[13] = [] {
-        Serial.println("Building screen 13");
         static char title[] = "Network ID";
         static char dictionary[] = "1234567890";
         static UI_GenericInput input = GI_make_input(
@@ -75,10 +195,8 @@ void init_builders() {
         screen_common.type = 2;
         screen_common.ui_obj_ptr = &input;
         screens[13] = screen_common;
-        Serial.println("Screen 13 built");
     };
     screen_builders[14] = [] {
-        Serial.println("Building screen 14");
         static char title[] = "Device ID";
         static char dictionary[] = "1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ";
         static UI_GenericInput input = GI_make_input(
@@ -95,6 +213,5 @@ void init_builders() {
         screen_common.type = 2;
         screen_common.ui_obj_ptr = &input;
         screens[14] = screen_common;
-        Serial.println("Screen 14 built");
     };
 }

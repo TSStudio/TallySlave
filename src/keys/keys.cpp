@@ -4,6 +4,12 @@ extern unsigned int current_screen;
 extern unsigned int screen;
 extern std::map<unsigned int, screen_co> screens;
 
+const int freq = 32768;
+const int ledChannel = 0;
+const int resolution = 10;
+
+int ledLevel = 512;
+
 bool last_key_enc_a_pressed = false;
 bool key_enc_a_pressed = false;
 bool key_enc_b_pressed = false;
@@ -47,6 +53,11 @@ void key_4_down() {
     }
 }
 
+unsigned led_light_oetf(unsigned x) {
+    //from 0-1023 to 0-1023
+    return x * x / 1023;
+}
+
 void key_enc_clockwise() {
     Serial.println("Clockwise");
     if (current_screen != 0) {
@@ -54,6 +65,9 @@ void key_enc_clockwise() {
             ((UI_GenericMenu*)(screens[current_screen].ui_obj_ptr))->handleSelectionChange(1);
         if (screens[current_screen].type == 2)
             ((UI_GenericInput*)(screens[current_screen].ui_obj_ptr))->handleSelectionChange(1);
+    } else {
+        ledLevel = min(ledLevel + 50, 1023);
+        ledcWrite(ledChannel, led_light_oetf(ledLevel));
     }
 }
 
@@ -64,10 +78,15 @@ void key_enc_counter_clockwise() {
             ((UI_GenericMenu*)(screens[current_screen].ui_obj_ptr))->handleSelectionChange(-1);
         if (screens[current_screen].type == 2)
             ((UI_GenericInput*)(screens[current_screen].ui_obj_ptr))->handleSelectionChange(-1);
+    } else {
+        ledLevel = max(ledLevel - 50, 0);
+        ledcWrite(ledChannel, led_light_oetf(ledLevel));
     }
 }
 
 void setup_keys() {
+    ledcSetup(ledChannel, freq, resolution);
+    ledcAttachPin(SCREEN_SPI_BLK_PIN, ledChannel);
     pinMode(KEY_BT_1_PIN, INPUT_PULLUP);
     pinMode(KEY_BT_2_PIN, INPUT_PULLUP);
     pinMode(KEY_BT_3_PIN, INPUT_PULLUP);
@@ -80,6 +99,7 @@ void setup_keys() {
     digitalWrite(LED_R_PIN, LOW);
     digitalWrite(LED_G_PIN, LOW);
     digitalWrite(LED_B_PIN, LOW);
+    ledcWrite(ledChannel, led_light_oetf(ledLevel));
 }
 
 void do_key_stuff() {

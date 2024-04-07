@@ -56,7 +56,6 @@ void Configuration::initFromEEPROM() {
     serverPort = (EEPROM.read(48) << 24) | (EEPROM.read(49) << 16) | (EEPROM.read(50) << 8) | EEPROM.read(51);
     for (int i = 0; i < 4; i++) {
         networkID[i] = EEPROM.read(i + 52);
-        Serial.printf("Network ID: %c\n", networkID[i]);
     }
     for (int i = 0; i < 4; i++) {
         deviceID[i] = EEPROM.read(i + 56);

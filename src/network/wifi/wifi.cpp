@@ -7,6 +7,7 @@ unsigned int last_retry_time;
 unsigned int reconnect_tcp_retry;
 
 char* server_addr;
+bool is_server_addr_malloced = false;
 
 unsigned int last_measured_rssi_time;
 int last_measured_rssi;
@@ -51,9 +52,23 @@ void sendHeartbeat() {
     }
 }
 
+void do_wifi_cleanup() {
+    WiFi.disconnect(true, true);
+    reconnect_retry = 0;
+    reconnect_tcp_retry = 0;
+    if (is_server_addr_malloced) {
+        free(server_addr);
+        is_server_addr_malloced = false;
+    }
+}
+
 void initWifiInstance(char* ssid, char* password, char* server) {
     WiFi.setHostname("T-TALLY-PROTOTYPE");
     WiFi.begin(ssid, password);
+    if (is_server_addr_malloced) {
+        free(server_addr);
+        is_server_addr_malloced = false;
+    }
     server_addr = server;
     reconnect_retry = 0;
     last_retry_time = millis();
@@ -64,6 +79,7 @@ void initWifiInstance(char* ssid, char* password, uint32_t server) {
     WiFi.setHostname("T-TALLY-PROTOTYPE");
     WiFi.begin(ssid, password);
     server_addr = (char*)malloc(16);
+    is_server_addr_malloced = true;
     sprintf(server_addr, "%d.%d.%d.%d", (server >> 24) & 0xFF, (server >> 16) & 0xFF, (server >> 8) & 0xFF, server & 0xFF);
     reconnect_retry = 0;
     last_retry_time = millis();

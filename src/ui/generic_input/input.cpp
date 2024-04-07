@@ -32,6 +32,7 @@ void UI_GenericInput::handleLeft() {
 
 void UI_GenericInput::handleRight() {
     if (this->editingIndex == this->maxLength - 1) return;
+    if (this->editingIndex == strlen(this->currentEditing)) return;
     this->editingIndex++;
     this->handleUpdate(true);
 }
