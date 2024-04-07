@@ -3,6 +3,7 @@
 #include <lvgl.h>
 #include <cstdio>
 #include <map>
+#include <Arduino.h>
 
 typedef void (*UI_Selection_Callback)();
 struct UI_GenericMenu_Selection {

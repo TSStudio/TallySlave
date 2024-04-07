@@ -6,6 +6,7 @@
 extern unsigned int current_screen;
 extern unsigned int screen;
 extern std::map<unsigned int, screen_co> screens;
+std::map<unsigned int, void (*)()> screen_builders;
 
 void screen_co::refresh() {
     if (type == 0) {
@@ -17,7 +18,15 @@ void screen_co::refresh() {
 
 void refresh_screen() {
     if (current_screen != screen) {
-        Serial.println("Changing screen");
+        Serial.printf("Changing screen to %d\n", screen);
+        //check if screen is already built
+        if (screens.find(screen) == screens.end()) {
+            Serial.println("No screen found, going back");
+            screen = current_screen;
+            return;
+        } else {
+            Serial.println("Screen already built");
+        }
         lv_screen_load(screens[screen].screen_obj);
         current_screen = screen;
     }
@@ -29,4 +38,22 @@ void init_builders() {
     //screen_builders[i]=[]{};
     // Ya need to provide a lambda function here
     // and finally push screen_co to screens
+    screen_builders[12] = [] {
+        Serial.println("Building screen 12");
+        static char title[] = "Wifi Settings";
+        static char selection1[] = "1";
+        static char selection2[] = "2";
+        static char selection3[] = "3";
+        UI_GenericMenu_Selection* selections = GM_make_selections(3, GM_make_selection(selection1), GM_make_selection(selection2), GM_make_selection(selection3));
+        static UI_GenericMenu menu = GM_make_menu(title, 1, screen, selections, 3);
+
+        static screen_co screen_common;
+        screen_common.screen_obj = menu.scr;
+        screen_common.refresh_handle_t0 = ui_generic_menu_handle_update;
+        screen_common.refresh_handle_t1 = NULL;
+        screen_common.type = 0;
+        screen_common.ui_obj_ptr = &menu;
+        screens[12] = screen_common;
+        Serial.println("Screen 12 built");
+    };
 }

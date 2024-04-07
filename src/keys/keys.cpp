@@ -32,6 +32,9 @@ void key_3_down() {
 }
 void key_4_down() {
     Serial.println("Key 4 down");
+    if (current_screen != 0) {
+        ((UI_GenericMenu*)(screens[current_screen].ui_obj_ptr))->handleClick();
+    }
 }
 
 void key_enc_clockwise() {

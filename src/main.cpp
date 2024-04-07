@@ -96,6 +96,8 @@ void setup() {
     screen_conmenu.ui_obj_ptr = &ui_conmenu;
     screens[1] = screen_conmenu;
 
+    init_builders();
+
     xTaskCreatePinnedToCore(
         obstructIOs,
         "ObstructIO",

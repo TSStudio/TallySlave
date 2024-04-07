@@ -52,18 +52,12 @@ void UI_GenericMenu::handleClick() {
 
     } else {
         screen_builders[this->selections[this->selected].clickScreen]();
-        *this->screen_in_display = this->selections[this->selected].clickScreen;
+        *(this->screen_in_display) = this->selections[this->selected].clickScreen;
     }
 }
 
 void UI_GenericMenu::handleBack() {
-    *this->screen_in_display = this->parent;
-    lv_obj_delete(this->scr);
-    free(this->labels_selection);
-    free(this->selections);
-    free(this->style_plain);
-    free(this->style_selected);
-    free(this);
+    *(this->screen_in_display) = this->parent;
 }
 
 UI_GenericMenu GM_make_menu(char* title, unsigned int parent, unsigned int& screen_in_display, UI_GenericMenu_Selection* selections, unsigned int selection_count) {
