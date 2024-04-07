@@ -77,4 +77,24 @@ void init_builders() {
         screens[13] = screen_common;
         Serial.println("Screen 13 built");
     };
+    screen_builders[14] = [] {
+        Serial.println("Building screen 14");
+        static char title[] = "Device ID";
+        static char dictionary[] = "1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        static UI_GenericInput input = GI_make_input(
+            title, 1, screen, dictionary, [](char* result) {
+                Serial.println("Saving");
+                Serial.println(result);
+                config.saveDeviceID(result);
+            },
+            3, config.deviceID, true);
+
+        static screen_co screen_common;
+        screen_common.screen_obj = input.scr;
+        screen_common.refresh_handle_t2 = ui_generic_input_handle_update;
+        screen_common.type = 2;
+        screen_common.ui_obj_ptr = &input;
+        screens[14] = screen_common;
+        Serial.println("Screen 14 built");
+    };
 }
