@@ -68,6 +68,7 @@ void nonObstructIOs(void* parameter) {
 
 void setup() {
     Serial.begin(115200);
+    EEPROM.begin(72);
     setup_screen();
     setup_keys();
 

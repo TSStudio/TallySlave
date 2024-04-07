@@ -20,34 +20,50 @@ void key_1_down() {
         Serial.println("Making screen 0");
         screen = 0;
     } else {
-        ((UI_GenericMenu*)(screens[current_screen].ui_obj_ptr))->handleBack();
+        if (screens[current_screen].type == 0)
+            ((UI_GenericMenu*)(screens[current_screen].ui_obj_ptr))->handleBack();
+        if (screens[current_screen].type == 2)
+            ((UI_GenericInput*)(screens[current_screen].ui_obj_ptr))->handleSaveInternal();
         screens.erase(current_screen);
     }
 }
 void key_2_down() {
     Serial.println("Key 2 down");
+    if (screens[current_screen].type == 2)
+        ((UI_GenericInput*)(screens[current_screen].ui_obj_ptr))->handleBackspace();
 }
 void key_3_down() {
     Serial.println("Key 3 down");
+    if (screens[current_screen].type == 2)
+        ((UI_GenericInput*)(screens[current_screen].ui_obj_ptr))->handleLeft();
 }
 void key_4_down() {
     Serial.println("Key 4 down");
     if (current_screen != 0) {
-        ((UI_GenericMenu*)(screens[current_screen].ui_obj_ptr))->handleClick();
+        if (screens[current_screen].type == 0)
+            ((UI_GenericMenu*)(screens[current_screen].ui_obj_ptr))->handleClick();
+        if (screens[current_screen].type == 2)
+            ((UI_GenericInput*)(screens[current_screen].ui_obj_ptr))->handleRight();
     }
 }
 
 void key_enc_clockwise() {
     Serial.println("Clockwise");
     if (current_screen != 0) {
-        ((UI_GenericMenu*)(screens[current_screen].ui_obj_ptr))->handleSelectionChange(1);
+        if (screens[current_screen].type == 0)
+            ((UI_GenericMenu*)(screens[current_screen].ui_obj_ptr))->handleSelectionChange(1);
+        if (screens[current_screen].type == 2)
+            ((UI_GenericInput*)(screens[current_screen].ui_obj_ptr))->handleSelectionChange(1);
     }
 }
 
 void key_enc_counter_clockwise() {
     Serial.println("Counter-clockwise");
     if (current_screen != 0) {
-        ((UI_GenericMenu*)(screens[current_screen].ui_obj_ptr))->handleSelectionChange(-1);
+        if (screens[current_screen].type == 0)
+            ((UI_GenericMenu*)(screens[current_screen].ui_obj_ptr))->handleSelectionChange(-1);
+        if (screens[current_screen].type == 2)
+            ((UI_GenericInput*)(screens[current_screen].ui_obj_ptr))->handleSelectionChange(-1);
     }
 }
 

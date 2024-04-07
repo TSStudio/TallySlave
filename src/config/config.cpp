@@ -1,6 +1,7 @@
 #include "config.h"
 
 void Configuration::initDefaultInstance() {
+    Serial.println("Initializing default configuration");
     wifiSSID = (char*)malloc(16);
     wifiPassword = (char*)malloc(16);
     strcpy(wifiSSID, "Example");
@@ -36,6 +37,7 @@ void Configuration::initFromEEPROM() {
         saveToEEPROM();
         return;
     }
+    Serial.println("Initializing configuration from EEPROM");
 
     wifiSSID = (char*)malloc(16);
     wifiPassword = (char*)malloc(16);
@@ -54,6 +56,7 @@ void Configuration::initFromEEPROM() {
     serverPort = (EEPROM.read(48) << 24) | (EEPROM.read(49) << 16) | (EEPROM.read(50) << 8) | EEPROM.read(51);
     for (int i = 0; i < 4; i++) {
         networkID[i] = EEPROM.read(i + 52);
+        Serial.printf("Network ID: %c\n", networkID[i]);
     }
     for (int i = 0; i < 4; i++) {
         deviceID[i] = EEPROM.read(i + 56);
@@ -62,7 +65,6 @@ void Configuration::initFromEEPROM() {
 }
 
 void Configuration::saveToEEPROM() {
-    EEPROM.begin(72);
     for (int i = 0; i < 16; i++) {
         EEPROM.write(i, wifiSSID[i]);
     }
@@ -99,5 +101,89 @@ void Configuration::saveToEEPROM() {
     EEPROM.write(61, 0xFC);
     EEPROM.write(62, 0xFC);
     EEPROM.write(63, 0xFC);
+    EEPROM.commit();
+    Serial.println("Configuration saved to EEPROM");
+}
+
+void Configuration::saveWifiSSID(char* ssid) {
+    strcpy(wifiSSID, ssid);
+    for (int i = 0; i < 16; i++) {
+        EEPROM.write(i, wifiSSID[i]);
+    }
+    EEPROM.commit();
+}
+
+void Configuration::saveWifiPassword(char* password) {
+    strcpy(wifiPassword, password);
+    for (int i = 0; i < 16; i++) {
+        EEPROM.write(i + 16, wifiPassword[i]);
+    }
+    EEPROM.commit();
+}
+
+void Configuration::saveServerIP(uint32_t ip) {
+    serverIP = ip;
+    EEPROM.write(32, (serverIP >> 24) & 0xFF);
+    EEPROM.write(33, (serverIP >> 16) & 0xFF);
+    EEPROM.write(34, (serverIP >> 8) & 0xFF);
+    EEPROM.write(35, serverIP & 0xFF);
+    EEPROM.commit();
+}
+
+void Configuration::saveSubnetMask(uint32_t mask) {
+    subnetMask = mask;
+    EEPROM.write(36, (subnetMask >> 24) & 0xFF);
+    EEPROM.write(37, (subnetMask >> 16) & 0xFF);
+    EEPROM.write(38, (subnetMask >> 8) & 0xFF);
+    EEPROM.write(39, subnetMask & 0xFF);
+    EEPROM.commit();
+}
+
+void Configuration::saveGatewayIP(uint32_t ip) {
+    gatewayIP = ip;
+    EEPROM.write(40, (gatewayIP >> 24) & 0xFF);
+    EEPROM.write(41, (gatewayIP >> 16) & 0xFF);
+    EEPROM.write(42, (gatewayIP >> 8) & 0xFF);
+    EEPROM.write(43, gatewayIP & 0xFF);
+    EEPROM.commit();
+}
+
+void Configuration::saveDNSIP(uint32_t ip) {
+    dnsIP = ip;
+    EEPROM.write(44, (dnsIP >> 24) & 0xFF);
+    EEPROM.write(45, (dnsIP >> 16) & 0xFF);
+    EEPROM.write(46, (dnsIP >> 8) & 0xFF);
+    EEPROM.write(47, dnsIP & 0xFF);
+    EEPROM.commit();
+}
+
+void Configuration::saveServerPort(uint32_t port) {
+    serverPort = port;
+    EEPROM.write(48, (serverPort >> 24) & 0xFF);
+    EEPROM.write(49, (serverPort >> 16) & 0xFF);
+    EEPROM.write(50, (serverPort >> 8) & 0xFF);
+    EEPROM.write(51, serverPort & 0xFF);
+    EEPROM.commit();
+}
+
+void Configuration::saveNetworkID(char* id) {
+    strcpy(networkID, id);
+    for (int i = 0; i < 4; i++) {
+        EEPROM.write(i + 52, networkID[i]);
+    }
+    EEPROM.commit();
+}
+
+void Configuration::saveDeviceID(char* id) {
+    strcpy(deviceID, id);
+    for (int i = 0; i < 4; i++) {
+        EEPROM.write(i + 56, deviceID[i]);
+    }
+    EEPROM.commit();
+}
+
+void Configuration::saveInterfaceType(unsigned char type) {
+    interface_type = type;
+    EEPROM.write(60, interface_type);
     EEPROM.commit();
 }

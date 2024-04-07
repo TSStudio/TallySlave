@@ -2,6 +2,7 @@
 #define _CONFIG_H_
 #include <cstring>
 #include <EEPROM.h>
+#include <Arduino.h>
 
 class Configuration {
 public:
@@ -18,7 +19,17 @@ public:
     void initDefaultInstance();
     void initFromEEPROM();
     void saveToEEPROM();
-    void destroyInstance();
+
+    void saveWifiSSID(char* ssid);
+    void saveWifiPassword(char* password);
+    void saveServerIP(uint32_t ip);
+    void saveSubnetMask(uint32_t mask);
+    void saveGatewayIP(uint32_t ip);
+    void saveDNSIP(uint32_t ip);
+    void saveServerPort(uint32_t port);
+    void saveNetworkID(char* id);
+    void saveDeviceID(char* id);
+    void saveInterfaceType(unsigned char type);
 };
 
 #endif

@@ -2,6 +2,11 @@
 #define UI_ALL_H
 
 #include "main/main.h"
+#include "generic_menu/menu.h"
+#include "generic_input/input.h"
+#include <Arduino.h>
+#include "../config/config.h"
+
 #include "conmenu/conmenu.h"
 #include <map>
 
@@ -12,6 +17,7 @@ struct screen_co {
     void (*keydown_handle)(uint8_t key);
     void (*refresh_handle_t0)(UI_GenericMenu* menu);
     void (*refresh_handle_t1)(ui_main_ui_entry* ui_main);
+    void (*refresh_handle_t2)(UI_GenericInput* input);
     unsigned int type;
     void refresh();
     void* ui_obj_ptr;
