@@ -3,6 +3,7 @@
 extern unsigned int current_screen;
 extern unsigned int screen;
 extern std::map<unsigned int, screen_co> screens;
+extern Configuration config;
 
 const int freq = 32768;
 const int ledChannel = 0;
@@ -40,6 +41,10 @@ void key_2_down() {
 }
 void key_3_down() {
     Serial.println("Key 3 down");
+    if (current_screen == 0) {
+        do_wifi_cleanup();
+        initWifiInstance(config.wifiSSID, config.wifiPassword, config.serverIP);
+    }
     if (screens[current_screen].type == 2)
         ((UI_GenericInput*)(screens[current_screen].ui_obj_ptr))->handleLeft();
 }

@@ -72,8 +72,7 @@ void setup() {
     setup_screen();
     setup_keys();
 
-    initWifiInstance("307", "306306306306", "192.168.5.9");  //DEBUG ONLY
-    //initWifiInstance(Configuration.wifiSSID, Configuration.wifiPassword, Configuration.serverIP);
+    initWifiInstance(config.wifiSSID, config.wifiPassword, config.serverIP);
 
     static screen_co screen_main, screen_conmenu;
 
