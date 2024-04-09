@@ -20,7 +20,9 @@ void UI_GenericInput::handleBackspace() {
     if (this->fixedLength) return;
     if (this->editingIndex == 0) return;
     this->editingIndex--;
-    this->currentEditing[this->editingIndex] = 0;
+    for (int i = this->editingIndex; i < strlen(this->currentEditing); i++) {
+        this->currentEditing[i] = this->currentEditing[i + 1];
+    }
     this->handleUpdate(true);
 }
 
