@@ -1,7 +1,7 @@
 #include <WiFi.h>
 #define SERVICE_PORT 38383
 
-unsigned int reconnect_retry;
+unsigned int reconnect_retry = 0;
 unsigned int last_retry_time;
 
 unsigned int reconnect_tcp_retry;
@@ -102,6 +102,8 @@ void doWifiStuff(int& rssi_to_write, char* PVW_to_write, char* PGM_to_write, int
     }
     if (WiFi.status() == WL_CONNECTED) {
         reconnect_retry = 0;
+    } else {
+        return;
     }
     if (!client.connected() && (((millis() - last_retry_time > 10000 || millis() < last_retry_time) && reconnect_tcp_retry < 5) || reconnect_tcp_retry == 0)) {
         reconnect_tcp_retry++;
