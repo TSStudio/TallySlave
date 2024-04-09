@@ -8,11 +8,13 @@ class Configuration {
 public:
     char* wifiSSID;
     char* wifiPassword;
+    uint32_t deviceIP;
     uint32_t serverIP;
     uint32_t subnetMask;
     uint32_t gatewayIP;
     uint32_t dnsIP;  // NO
     uint32_t serverPort;
+    uint32_t screen_illuminance;
     char* networkID;
     char* deviceID;
     unsigned char interface_type;
@@ -20,6 +22,8 @@ public:
     void initFromEEPROM();
     void saveToEEPROM();
 
+    void saveDeviceIP(uint32_t ip);
+    void saveScreenIlluminance(uint32_t ill);
     void saveWifiSSID(char* ssid);
     void saveWifiPassword(char* password);
     void saveServerIP(uint32_t ip);

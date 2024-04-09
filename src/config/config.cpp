@@ -6,6 +6,8 @@ void Configuration::initDefaultInstance() {
     wifiPassword = (char*)malloc(16);
     strcpy(wifiSSID, "Example");
     strcpy(wifiPassword, "password");
+    deviceIP = 0x0A000003;  //10.0.0.3
+    screen_illuminance = 0x00000200;
     serverIP = 0x0A000002;
     subnetMask = 0xFFFFFF00;
     gatewayIP = 0x0A000001;
@@ -30,9 +32,11 @@ void Configuration::initFromEEPROM() {
     // 52~55: networkID
     // 56~59: deviceID
     // 60: interface_type
-    // 61-63: 0xFCFCFCFC -> to check if the EEPROM is initialized
-    //check 60-63
-    if (EEPROM.read(61) != 0xFC || EEPROM.read(62) != 0xFC || EEPROM.read(63) != 0xFC) {
+    // 61-64: deviceIP
+    // 65-68: screen_illuminance
+    // 69-71: 0xFCFCFCFC -> to check if the EEPROM is initialized
+    //check 69-71
+    if (EEPROM.read(69) != 0xFC || EEPROM.read(70) != 0xFC || EEPROM.read(71) != 0xFC) {
         initDefaultInstance();
         saveToEEPROM();
         return;
@@ -61,6 +65,8 @@ void Configuration::initFromEEPROM() {
         deviceID[i] = EEPROM.read(i + 56);
     }
     interface_type = EEPROM.read(60);
+    deviceIP = (EEPROM.read(61) << 24) | (EEPROM.read(62) << 16) | (EEPROM.read(63) << 8) | EEPROM.read(64);
+    screen_illuminance = (EEPROM.read(65) << 24) | (EEPROM.read(66) << 16) | (EEPROM.read(67) << 8) | EEPROM.read(68);
 }
 
 void Configuration::saveToEEPROM() {
@@ -97,11 +103,37 @@ void Configuration::saveToEEPROM() {
         EEPROM.write(i + 56, deviceID[i]);
     }
     EEPROM.write(60, interface_type);
-    EEPROM.write(61, 0xFC);
-    EEPROM.write(62, 0xFC);
-    EEPROM.write(63, 0xFC);
+    EEPROM.write(61, (deviceIP >> 24) & 0xFF);
+    EEPROM.write(62, (deviceIP >> 16) & 0xFF);
+    EEPROM.write(63, (deviceIP >> 8) & 0xFF);
+    EEPROM.write(64, deviceIP & 0xFF);
+    EEPROM.write(65, (screen_illuminance >> 24) & 0xFF);
+    EEPROM.write(66, (screen_illuminance >> 16) & 0xFF);
+    EEPROM.write(67, (screen_illuminance >> 8) & 0xFF);
+    EEPROM.write(68, screen_illuminance & 0xFF);
+    EEPROM.write(69, 0xFC);
+    EEPROM.write(70, 0xFC);
+    EEPROM.write(71, 0xFC);
     EEPROM.commit();
     Serial.println("Configuration saved to EEPROM");
+}
+
+void Configuration::saveDeviceIP(uint32_t ip) {
+    deviceIP = ip;
+    EEPROM.write(61, (deviceIP >> 24) & 0xFF);
+    EEPROM.write(62, (deviceIP >> 16) & 0xFF);
+    EEPROM.write(63, (deviceIP >> 8) & 0xFF);
+    EEPROM.write(64, deviceIP & 0xFF);
+    EEPROM.commit();
+}
+
+void Configuration::saveScreenIlluminance(uint32_t ill) {
+    screen_illuminance = ill;
+    EEPROM.write(65, (screen_illuminance >> 24) & 0xFF);
+    EEPROM.write(66, (screen_illuminance >> 16) & 0xFF);
+    EEPROM.write(67, (screen_illuminance >> 8) & 0xFF);
+    EEPROM.write(68, screen_illuminance & 0xFF);
+    EEPROM.commit();
 }
 
 void Configuration::saveWifiSSID(char* ssid) {

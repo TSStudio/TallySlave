@@ -28,10 +28,17 @@ void ui_generic_menu_handle_update(UI_GenericMenu* menu) {
 
 void UI_GenericMenu::handleUpdate(bool forceUpdate) {
     if (this->selected_prev == this->selected && !forceUpdate) return;
+
     lv_obj_remove_style(this->labels_selection[this->selected_prev], this->style_selected, 0);
-    lv_obj_add_style(this->labels_selection[this->selected_prev], this->style_plain, 0);
+    if (this->selections[this->selected_prev].isUsing)
+        lv_obj_add_style(this->labels_selection[this->selected_prev], this->style_using, 0);
+    else
+        lv_obj_add_style(this->labels_selection[this->selected_prev], this->style_plain, 0);
     lv_obj_remove_style(this->labels_selection[this->selected], this->style_plain, 0);
-    lv_obj_add_style(this->labels_selection[this->selected], this->style_selected, 0);
+    if (this->selections[this->selected].isUsing)
+        lv_obj_add_style(this->labels_selection[this->selected], this->style_using_selected, 0);
+    else
+        lv_obj_add_style(this->labels_selection[this->selected], this->style_selected, 0);
     this->selected_prev = this->selected;
 }
 
@@ -48,7 +55,7 @@ void UI_GenericMenu::handleSelectionChange(int delta) {
 void UI_GenericMenu::handleClick() {
     if (this->selections[this->selected].clickScreen == 0) {
         if (this->selections[this->selected].callback != NULL)
-            this->selections[this->selected].callback();
+            this->selections[this->selected].callback(*this);
 
     } else {
         screen_builders[this->selections[this->selected].clickScreen]();
@@ -97,6 +104,30 @@ UI_GenericMenu GM_make_menu(char* title, unsigned int parent, unsigned int& scre
     lv_style_set_pad_left(&style_selected, 2);
     lv_style_set_width(&style_selected, 152);
     menu.style_selected = &style_selected;
+
+    static lv_style_t style_using;
+    lv_style_init(&style_selected);
+    lv_style_set_text_color(&style_selected, lv_color_black());
+    lv_style_set_bg_color(&style_selected, lv_color_make(0xff, 0x00, 0x00));
+    lv_style_set_bg_opa(&style_selected, LV_OPA_100);
+    lv_style_set_text_font(&style_selected, &siyuan12);
+    lv_style_set_pad_top(&style_selected, 2);
+    lv_style_set_pad_bottom(&style_selected, 2);
+    lv_style_set_pad_left(&style_selected, 2);
+    lv_style_set_width(&style_selected, 152);
+    menu.style_using = &style_using;
+
+    static lv_style_t style_using_selected;
+    lv_style_init(&style_selected);
+    lv_style_set_text_color(&style_selected, lv_color_black());
+    lv_style_set_bg_color(&style_selected, lv_color_make(0xff, 0x88, 0x88));
+    lv_style_set_bg_opa(&style_selected, LV_OPA_100);
+    lv_style_set_text_font(&style_selected, &siyuan12);
+    lv_style_set_pad_top(&style_selected, 2);
+    lv_style_set_pad_bottom(&style_selected, 2);
+    lv_style_set_pad_left(&style_selected, 2);
+    lv_style_set_width(&style_selected, 152);
+    menu.style_using_selected = &style_using_selected;
 
     menu.label_title = lv_label_create(menu.scr);
     lv_label_set_text(menu.label_title, title);

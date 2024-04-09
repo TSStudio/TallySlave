@@ -73,6 +73,7 @@ void key_enc_clockwise() {
     } else {
         ledLevel = min(ledLevel + 50, 1023);
         ledcWrite(ledChannel, led_light_oetf(ledLevel));
+        config.saveScreenIlluminance(ledLevel);
     }
 }
 
@@ -86,10 +87,12 @@ void key_enc_counter_clockwise() {
     } else {
         ledLevel = max(ledLevel - 50, 0);
         ledcWrite(ledChannel, led_light_oetf(ledLevel));
+        config.saveScreenIlluminance(ledLevel);
     }
 }
 
 void setup_keys() {
+    ledLevel = config.screen_illuminance;
     ledcSetup(ledChannel, freq, resolution);
     ledcAttachPin(SCREEN_SPI_BLK_PIN, ledChannel);
     pinMode(KEY_BT_1_PIN, INPUT_PULLUP);

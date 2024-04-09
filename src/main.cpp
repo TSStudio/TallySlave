@@ -69,6 +69,8 @@ void nonObstructIOs(void* parameter) {
 void setup() {
     Serial.begin(115200);
     EEPROM.begin(72);
+    config.initFromEEPROM();
+
     setup_screen();
     setup_keys();
 
@@ -84,7 +86,6 @@ void setup() {
     screen_main.ui_obj_ptr = ui_main;
     screens[0] = screen_main;
 
-    config.initFromEEPROM();
     free(ui_main->args->current_device_id);
     ui_main->args->current_device_id = config.deviceID;
 

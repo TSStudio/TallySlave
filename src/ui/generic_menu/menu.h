@@ -5,7 +5,7 @@
 #include <map>
 #include <Arduino.h>
 
-typedef void (*UI_Selection_Callback)();
+typedef void (*UI_Selection_Callback)(UI_GenericMenu&);
 struct UI_GenericMenu_Selection {
     char* text;
     bool isUsing;
@@ -26,6 +26,8 @@ struct UI_GenericMenu {
     UI_GenericMenu_Selection* selections;
     lv_style_t* style_plain;
     lv_style_t* style_selected;
+    lv_style_t* style_using;
+    lv_style_t* style_using_selected;
     unsigned int selection_count;
     unsigned int parent;
     unsigned int* screen_in_display;  //this is for changing screen

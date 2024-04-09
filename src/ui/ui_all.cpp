@@ -40,6 +40,27 @@ void init_builders() {
     //screen_builders[i]=[]{};
     // Ya need to provide a lambda function here
     // and finally push screen_co to screens
+    screen_builders[11] = [] {
+        static char title[] = "Select Interface";
+        static char selection1[] = "CAN";
+        static char selection2[] = "LoRa";
+        static char selection3[] = "WiFi";
+        UI_GenericMenu_Selection* selections = GM_make_selections(3, GM_make_selection(selection1, false, 0, [](UI_GenericMenu& menu) {
+                                                                      for (int i = 0; i < 3; i++) {
+                                                                          menu.selections[i].isUsing = false;
+                                                                      }
+                                                                      menu.selections[0].isUsing = true;
+                                                                      menu.handleUpdate(true);
+                                                                  }),
+                                                                  GM_make_selection(selection2, false, 0, [](UI_GenericMenu& menu) {}), GM_make_selection(selection3, false, 0, [](UI_GenericMenu& menu) {}));  //TODO callback function
+        static UI_GenericMenu menu = GM_make_menu(title, 1, screen, selections, 3);
+        static screen_co screen_common;
+        screen_common.screen_obj = menu.scr;
+        screen_common.refresh_handle_t0 = ui_generic_menu_handle_update;
+        screen_common.type = 0;
+        screen_common.ui_obj_ptr = &menu;
+        screens[11] = screen_common;
+    };
     screen_builders[12] = [] {
         static char title[] = "Wifi Settings";
         static char selection1[] = "Authentication";
@@ -177,6 +198,126 @@ void init_builders() {
         screen_common.type = 2;
         screen_common.ui_obj_ptr = &input;
         screens[1222] = screen_common;
+    };
+    screen_builders[124] = [] {
+        static char title[] = "IP Manual Set";
+        static char selection1[] = "IP Address";
+        static char selection2[] = "Subnet Mask";
+        static char selection3[] = "Gateway(Router)";
+        static char selection4[] = "DNS Server";
+        UI_GenericMenu_Selection* selections = GM_make_selections(4, GM_make_selection(selection1, false, 1241), GM_make_selection(selection2, false, 1242), GM_make_selection(selection3, false, 1243), GM_make_selection(selection4, false, 1244));
+        static UI_GenericMenu menu = GM_make_menu(title, 12, screen, selections, 4);
+
+        static screen_co screen_common;
+        screen_common.screen_obj = menu.scr;
+        screen_common.refresh_handle_t0 = ui_generic_menu_handle_update;
+        screen_common.type = 0;
+        screen_common.ui_obj_ptr = &menu;
+        screens[124] = screen_common;
+    };
+    screen_builders[1241] = [] {
+        static char title[] = "IP Address";
+        static char dictionary[] = "1234567890.";
+        char* ip_r = IPConstructor(config.serverIP);
+        static UI_GenericInput input = GI_make_input(
+            title, 124, screen, dictionary, [](char* result) {
+                IPValidatorResult ipResult = IPValidator(result);
+                Serial.println("Saving");
+                if (!ipResult.valid) {
+                    Serial.println("Invalid IP");
+                    return;
+                }
+                Serial.println(ipResult.ip);
+                config.saveDeviceIP(ipResult.ip);
+                do_wifi_cleanup();
+                initWifiInstance(config.wifiSSID, config.wifiPassword, config.serverIP);
+            },
+            15, ip_r, false);
+        free(ip_r);
+        static screen_co screen_common;
+        screen_common.screen_obj = input.scr;
+        screen_common.refresh_handle_t2 = ui_generic_input_handle_update;
+        screen_common.type = 2;
+        screen_common.ui_obj_ptr = &input;
+        screens[1241] = screen_common;
+    };
+    screen_builders[1242] = [] {
+        static char title[] = "Subnet Mask";
+        static char dictionary[] = "1234567890.";
+        char* ip_r = IPConstructor(config.serverIP);
+        static UI_GenericInput input = GI_make_input(
+            title, 124, screen, dictionary, [](char* result) {
+                IPValidatorResult ipResult = SubnetMaskValidator(result);
+                Serial.println("Saving");
+                if (!ipResult.valid) {
+                    Serial.println("Invalid Subnet Mask");
+                    return;
+                }
+                Serial.println(ipResult.ip);
+                config.saveSubnetMask(ipResult.ip);
+                do_wifi_cleanup();
+                initWifiInstance(config.wifiSSID, config.wifiPassword, config.serverIP);
+            },
+            15, ip_r, false);
+        free(ip_r);
+        static screen_co screen_common;
+        screen_common.screen_obj = input.scr;
+        screen_common.refresh_handle_t2 = ui_generic_input_handle_update;
+        screen_common.type = 2;
+        screen_common.ui_obj_ptr = &input;
+        screens[1242] = screen_common;
+    };
+    screen_builders[1243] = [] {
+        static char title[] = "Gateway";
+        static char dictionary[] = "1234567890.";
+        char* ip_r = IPConstructor(config.serverIP);
+        static UI_GenericInput input = GI_make_input(
+            title, 124, screen, dictionary, [](char* result) {
+                IPValidatorResult ipResult = IPValidator(result);
+                Serial.println("Saving");
+                if (!ipResult.valid) {
+                    Serial.println("Invalid IP");
+                    return;
+                }
+                Serial.println(ipResult.ip);
+                config.saveGatewayIP(ipResult.ip);
+                do_wifi_cleanup();
+                initWifiInstance(config.wifiSSID, config.wifiPassword, config.serverIP);
+            },
+            15, ip_r, false);
+        free(ip_r);
+        static screen_co screen_common;
+        screen_common.screen_obj = input.scr;
+        screen_common.refresh_handle_t2 = ui_generic_input_handle_update;
+        screen_common.type = 2;
+        screen_common.ui_obj_ptr = &input;
+        screens[1243] = screen_common;
+    };
+    screen_builders[1244] = [] {
+        static char title[] = "DNS Server";
+        static char dictionary[] = "1234567890.";
+        char* ip_r = IPConstructor(config.serverIP);
+        static UI_GenericInput input = GI_make_input(
+            title, 124, screen, dictionary, [](char* result) {
+                IPValidatorResult ipResult = IPValidator(result);
+                Serial.println("Saving");
+                if (!ipResult.valid) {
+                    Serial.println("Invalid IP");
+                    return;
+                }
+                Serial.println(ipResult.ip);
+                config.saveDNSIP(ipResult.ip);
+                do_wifi_cleanup();
+                initWifiInstance(config.wifiSSID, config.wifiPassword, config.serverIP);
+            },
+            15, ip_r, false);
+        free(ip_r);
+        static screen_co screen_common;
+        screen_common.screen_obj = input.scr;
+        screen_common.refresh_handle_t2 = ui_generic_input_handle_update;
+        screen_common.type = 2;
+        screen_common.ui_obj_ptr = &input;
+        screens[1244] = screen_common;
     };
     screen_builders[13] = [] {
         static char title[] = "Network ID";
