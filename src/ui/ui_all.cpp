@@ -79,7 +79,7 @@ void init_builders() {
         screen_common.type = 0;
         screen_common.ui_obj_ptr = &menu;
         screens[11] = screen_common;
-        menu->handleUpdate(true);
+        menu.handleUpdate(true);
     };
     screen_builders[12] = [] {
         static char title[] = "Wifi Settings";
