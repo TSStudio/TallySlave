@@ -31,21 +31,25 @@ void obstructIOs(void* parameter) {
     Serial.println(xPortGetCoreID());
     for (;;) {
         if (cycle0 % 3000 == 0) {
-            doWifiStuff(ui_main->args->signaldBm, ui_main->args->preview_device_id, ui_main->args->program_device_id, ui_main->args->signalState, config.networkID);
-            if (strcmp(ui_main->args->program_device_id, ui_main->args->current_device_id) == 0) {
-                digitalWrite(LED_R_PIN, HIGH);
-                digitalWrite(LED_G_PIN, LOW);
-                ui_main->args->state = 2;
-            } else if (strcmp(ui_main->args->preview_device_id, ui_main->args->current_device_id) == 0) {
-                digitalWrite(LED_R_PIN, LOW);
-                digitalWrite(LED_G_PIN, HIGH);
-                ui_main->args->state = 1;
-            } else {
-                digitalWrite(LED_R_PIN, LOW);
-                digitalWrite(LED_G_PIN, LOW);
-                ui_main->args->state = 0;
+            if (config.interface_type == 1) {
+                doWifiStuff(ui_main->args->signaldBm, ui_main->args->preview_device_id, ui_main->args->program_device_id, ui_main->args->signalState, config.networkID);
+                if (strcmp(ui_main->args->program_device_id, ui_main->args->current_device_id) == 0) {
+                    digitalWrite(LED_R_PIN, HIGH);
+                    digitalWrite(LED_G_PIN, LOW);
+                    ui_main->args->state = 2;
+                } else if (strcmp(ui_main->args->preview_device_id, ui_main->args->current_device_id) == 0) {
+                    digitalWrite(LED_R_PIN, LOW);
+                    digitalWrite(LED_G_PIN, HIGH);
+                    ui_main->args->state = 1;
+                } else {
+                    digitalWrite(LED_R_PIN, LOW);
+                    digitalWrite(LED_G_PIN, LOW);
+                    ui_main->args->state = 0;
+                }
             }
-            //ui_conmenu.selected = (ui_conmenu.selected + 1) % ui_conmenu.selection_count;
+            if (ui_main->args->signalType != config.interface_type) {
+                ui_main->args->signalType = config.interface_type;
+            }
         }
         cycle0++;
     }
@@ -74,7 +78,9 @@ void setup() {
     setup_screen();
     setup_keys();
 
-    initWifiInstance(config.wifiSSID, config.wifiPassword, config.serverIP);
+    if (config.interface_type == 1) {
+        initWifiInstance(config.wifiSSID, config.wifiPassword, config.serverIP);
+    }
 
     static screen_co screen_main, screen_conmenu;
 
@@ -88,6 +94,8 @@ void setup() {
 
     free(ui_main->args->current_device_id);
     ui_main->args->current_device_id = config.deviceID;
+
+    //ui_main->args->signalType = config.interface_type;
 
     ui_conmenu = setup_ui_conmenu_screen(screen);
     screen_conmenu.screen_obj = ui_conmenu.scr;

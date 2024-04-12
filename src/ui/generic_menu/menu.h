@@ -5,7 +5,7 @@
 #include <map>
 #include <Arduino.h>
 
-typedef void (*UI_Selection_Callback)(UI_GenericMenu&);
+using UI_Selection_Callback = void (*)(void*);
 struct UI_GenericMenu_Selection {
     char* text;
     bool isUsing;
@@ -13,7 +13,7 @@ struct UI_GenericMenu_Selection {
     UI_Selection_Callback callback;
 };
 
-UI_GenericMenu_Selection GM_make_selection(char* text, bool isUsing = false, int clickScreen = 0, UI_Selection_Callback callback = NULL);
+UI_GenericMenu_Selection GM_make_selection(char* text, bool isUsing = false, int clickScreen = 0, UI_Selection_Callback callback = nullptr);
 UI_GenericMenu_Selection* GM_make_selections(unsigned int count, ...);
 
 /**

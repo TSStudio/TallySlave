@@ -43,16 +43,35 @@ void init_builders() {
     screen_builders[11] = [] {
         static char title[] = "Select Interface";
         static char selection1[] = "CAN";
-        static char selection2[] = "LoRa";
-        static char selection3[] = "WiFi";
-        UI_GenericMenu_Selection* selections = GM_make_selections(3, GM_make_selection(selection1, false, 0, [](UI_GenericMenu& menu) {
-                                                                      for (int i = 0; i < 3; i++) {
-                                                                          menu.selections[i].isUsing = false;
-                                                                      }
-                                                                      menu.selections[0].isUsing = true;
-                                                                      menu.handleUpdate(true);
-                                                                  }),
-                                                                  GM_make_selection(selection2, false, 0, [](UI_GenericMenu& menu) {}), GM_make_selection(selection3, false, 0, [](UI_GenericMenu& menu) {}));  //TODO callback function
+        static char selection2[] = "WiFi";
+        static char selection3[] = "LoRa";
+        static UI_Selection_Callback callback1 = [](void* menu) {
+            for (int i = 0; i < 3; i++) {
+                ((UI_GenericMenu*)menu)->selections[i].isUsing = false;
+            }
+            ((UI_GenericMenu*)menu)->selections[0].isUsing = true;
+            ((UI_GenericMenu*)menu)->handleUpdate(true);
+            config.saveInterfaceType(0);
+        };
+        static UI_Selection_Callback callback2 = [](void* menu) {
+            for (int i = 0; i < 3; i++) {
+                ((UI_GenericMenu*)menu)->selections[i].isUsing = false;
+            }
+            ((UI_GenericMenu*)menu)->selections[1].isUsing = true;
+            ((UI_GenericMenu*)menu)->handleUpdate(true);
+            config.saveInterfaceType(1);
+        };
+        static UI_Selection_Callback callback3 = [](void* menu) {
+            for (int i = 0; i < 3; i++) {
+                ((UI_GenericMenu*)menu)->selections[i].isUsing = false;
+            }
+            ((UI_GenericMenu*)menu)->selections[2].isUsing = true;
+            ((UI_GenericMenu*)menu)->handleUpdate(true);
+            config.saveInterfaceType(2);
+        };
+        UI_GenericMenu_Selection* selections = GM_make_selections(3, GM_make_selection(selection1, false, 0, callback1), GM_make_selection(selection2, false, 0, callback2), GM_make_selection(selection3, false, 0, callback3));
+        unsigned char interface_type = config.interface_type;
+        selections[interface_type].isUsing = true;
         static UI_GenericMenu menu = GM_make_menu(title, 1, screen, selections, 3);
         static screen_co screen_common;
         screen_common.screen_obj = menu.scr;
@@ -60,6 +79,7 @@ void init_builders() {
         screen_common.type = 0;
         screen_common.ui_obj_ptr = &menu;
         screens[11] = screen_common;
+        menu->handleUpdate(true);
     };
     screen_builders[12] = [] {
         static char title[] = "Wifi Settings";
