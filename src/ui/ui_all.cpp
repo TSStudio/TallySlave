@@ -132,7 +132,25 @@ void init_builders() {
     };
     screen_builders[1212] = [] {
         static char title[] = "Password";
-        static char dictionary[] = "1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+        static char dictionary[] = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz.?!:;-_`~()[]";
+        // from IBM security-characters-that-are-valid-user-ids-passwords
+        // 小写字符 {a-z}
+        // 大写字符 {A-Z}
+        // 数字 {0-9}
+        // 惊叹号 {!}
+        // 左括号 {(}
+        // 右括号 {)}
+        // 短划线 {-}；不支持将该字符用作用户标识和密码的首字符
+        // 句点 {.}；不支持将该字符用作用户标识和密码的首字符
+        // 问号 {?}
+        // 左方括号 {[}
+        // 右方括号 {]}
+        // 下划线 {_}；这是中唯一受支持的特殊字符
+        // 重音符 {`}
+        // 波浪号｛~｝
+        // 分号 {;}
+        // 冒号 {:}
+
         static UI_GenericInput input = GI_make_input(
             title, 121, screen, dictionary, [](char* result) {
                 Serial.println("Saving");
@@ -165,7 +183,7 @@ void init_builders() {
     };
     screen_builders[1221] = [] {
         static char title[] = "Server IP";
-        static char dictionary[] = "1234567890.";
+        static char dictionary[] = "01234567890.";
         char* ip_r = IPConstructor(config.serverIP);
         static UI_GenericInput input = GI_make_input(
             title, 122, screen, dictionary, [](char* result) {
@@ -191,7 +209,7 @@ void init_builders() {
     };
     screen_builders[1222] = [] {
         static char title[] = "Server Port";
-        static char dictionary[] = "1234567890";
+        static char dictionary[] = "0123456789";
         char* ip_r = PortConstructor(config.serverPort);
         static UI_GenericInput input = GI_make_input(
             title, 122, screen, dictionary, [](char* result) {
@@ -237,7 +255,7 @@ void init_builders() {
     };
     screen_builders[1241] = [] {
         static char title[] = "IP Address";
-        static char dictionary[] = "1234567890.";
+        static char dictionary[] = "01234567890.";
         char* ip_r = IPConstructor(config.serverIP);
         static UI_GenericInput input = GI_make_input(
             title, 124, screen, dictionary, [](char* result) {
@@ -263,7 +281,7 @@ void init_builders() {
     };
     screen_builders[1242] = [] {
         static char title[] = "Subnet Mask";
-        static char dictionary[] = "1234567890.";
+        static char dictionary[] = "0123456789.";
         char* ip_r = IPConstructor(config.serverIP);
         static UI_GenericInput input = GI_make_input(
             title, 124, screen, dictionary, [](char* result) {
@@ -289,7 +307,7 @@ void init_builders() {
     };
     screen_builders[1243] = [] {
         static char title[] = "Gateway";
-        static char dictionary[] = "1234567890.";
+        static char dictionary[] = "0123456789.";
         char* ip_r = IPConstructor(config.serverIP);
         static UI_GenericInput input = GI_make_input(
             title, 124, screen, dictionary, [](char* result) {
@@ -315,7 +333,7 @@ void init_builders() {
     };
     screen_builders[1244] = [] {
         static char title[] = "DNS Server";
-        static char dictionary[] = "1234567890.";
+        static char dictionary[] = "0123456789.";
         char* ip_r = IPConstructor(config.serverIP);
         static UI_GenericInput input = GI_make_input(
             title, 124, screen, dictionary, [](char* result) {
@@ -341,7 +359,7 @@ void init_builders() {
     };
     screen_builders[13] = [] {
         static char title[] = "Network ID";
-        static char dictionary[] = "1234567890";
+        static char dictionary[] = "0123456789";
         static UI_GenericInput input = GI_make_input(
             title, 1, screen, dictionary, [](char* result) {
                 Serial.println("Saving");
