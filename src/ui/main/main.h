@@ -12,7 +12,7 @@ struct ui_main_args {
     char* preview_device_id;
     char* program_device_id;
     int signaldBm;
-    int signalType;   //0: CAN, 1: WiFi, 2:LoRa
+    int signalType;   //0: CAN, 1: Wi-Fi, 2:LoRa
     int signalState;  //(WiFi Only)0: Not connected, 1: Connected But No Server 2: Connected And Server
     int state;        //0: None, 1: Preview, 2: Program
     void init();

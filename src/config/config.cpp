@@ -17,7 +17,7 @@ void Configuration::initDefaultInstance() {
     deviceID = (char*)malloc(4);
     strcpy(networkID, "000");
     strcpy(deviceID, "A01");
-    interface_type = 1;  // 0: CAN, 1: WiFi, 2: LoRa
+    interface_type = 1;  // 0: CAN, 1: Wi-Fi, 2: LoRa
 }
 
 void Configuration::initFromEEPROM() {

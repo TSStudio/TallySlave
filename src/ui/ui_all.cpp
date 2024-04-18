@@ -43,7 +43,7 @@ void init_builders() {
     screen_builders[11] = [] {
         static char title[] = "Select Interface";
         static char selection1[] = "CAN";
-        static char selection2[] = "WiFi";
+        static char selection2[] = "Wi-Fi";
         static char selection3[] = "LoRa";
         static UI_Selection_Callback callback1 = [](void* menu) {
             for (int i = 0; i < 3; i++) {
@@ -82,7 +82,7 @@ void init_builders() {
         menu.handleUpdate(true);
     };
     screen_builders[12] = [] {
-        static char title[] = "Wifi Settings";
+        static char title[] = "Wi-Fi Settings";
         static char selection1[] = "Authentication";
         static char selection2[] = "Server";
         static char selection3[] = "Toggle DHCP";
@@ -100,7 +100,7 @@ void init_builders() {
     screen_builders[121] = [] {
         static char title[] = "Authentication";
         static char selection1[] = "SSID";
-        static char selection2[] = "Passcode";
+        static char selection2[] = "Password";
         UI_GenericMenu_Selection* selections = GM_make_selections(2, GM_make_selection(selection1, false, 1211), GM_make_selection(selection2, false, 1212));
         static UI_GenericMenu menu = GM_make_menu(title, 12, screen, selections, 2);
 
@@ -131,7 +131,7 @@ void init_builders() {
         screens[1211] = screen_common;
     };
     screen_builders[1212] = [] {
-        static char title[] = "Passcode";
+        static char title[] = "Password";
         static char dictionary[] = "1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
         static UI_GenericInput input = GI_make_input(
             title, 121, screen, dictionary, [](char* result) {
@@ -223,7 +223,7 @@ void init_builders() {
         static char title[] = "IP Manual Set";
         static char selection1[] = "IP Address";
         static char selection2[] = "Subnet Mask";
-        static char selection3[] = "Gateway(Router)";
+        static char selection3[] = "Gateway (Router)";
         static char selection4[] = "DNS Server";
         UI_GenericMenu_Selection* selections = GM_make_selections(4, GM_make_selection(selection1, false, 1241), GM_make_selection(selection2, false, 1242), GM_make_selection(selection3, false, 1243), GM_make_selection(selection4, false, 1244));
         static UI_GenericMenu menu = GM_make_menu(title, 12, screen, selections, 4);

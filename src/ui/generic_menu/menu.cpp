@@ -89,6 +89,9 @@ UI_GenericMenu GM_make_menu(char* title, unsigned int parent, unsigned int& scre
     lv_style_init(&style_title);
     lv_style_set_text_color(&style_title, lv_color_white());
     lv_style_set_text_font(&style_title, &siyuan12);
+    lv_style_set_border_color(&style_title, lv_color_white());
+    lv_style_set_border_side(&style_title, LV_BORDER_SIDE_BOTTOM);
+    lv_style_set_border_width(&style_title, 1);
 
     static lv_style_t style_plain;
     lv_style_init(&style_plain);
@@ -157,6 +160,7 @@ UI_GenericMenu GM_make_menu(char* title, unsigned int parent, unsigned int& scre
         else
             lv_obj_add_style(menu.labels_selection[i], &style_plain, 0);
     }
+
     menu.selections = selections;
     menu.selection_count = selection_count;
     menu.parent = parent;
