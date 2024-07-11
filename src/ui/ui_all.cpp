@@ -62,7 +62,7 @@ void init_builders() {
     screen_builders[11] = [] {
         static char title[] = "Select Interface";
         static char selection1[] = "CAN";
-        static char selection2[] = "WiFi";
+        static char selection2[] = "Wi-Fi";
         static char selection3[] = "LoRa";
         static UI_Selection_Callback callback1 = [](void* menu) {
             for (int i = 0; i < 3; i++) {
@@ -101,7 +101,7 @@ void init_builders() {
         menu->handleUpdate(true);
     };
     screen_builders[12] = [] {
-        static char title[] = "Wifi Settings";
+        static char title[] = "Wi-Fi Settings";
         static char selection1[] = "Authentication";
         static char selection2[] = "Server";
         static char selection3[] = "Toggle DHCP";
@@ -119,7 +119,7 @@ void init_builders() {
     screen_builders[121] = [] {
         static char title[] = "Authentication";
         static char selection1[] = "SSID";
-        static char selection2[] = "Passcode";
+        static char selection2[] = "Password";
         static UI_GenericMenu_Selection* selections = GM_make_selections(2, GM_make_selection(selection1, false, 1211), GM_make_selection(selection2, false, 1212));
         UI_GenericMenu* menu = new UI_GenericMenu(title, 12, screen, selections, 2, 121);
 
@@ -150,8 +150,26 @@ void init_builders() {
         screens[1211] = screen_common;
     };
     screen_builders[1212] = [] {
-        static char title[] = "Passcode";
-        static char dictionary[] = "1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+        static char title[] = "Password";
+        static char dictionary[] = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz.?!:;-_`~()[]";
+        // from IBM security-characters-that-are-valid-user-ids-passwords
+        // 小写字符 {a-z}
+        // 大写字符 {A-Z}
+        // 数字 {0-9}
+        // 惊叹号 {!}
+        // 左括号 {(}
+        // 右括号 {)}
+        // 短划线 {-}；不支持将该字符用作用户标识和密码的首字符
+        // 句点 {.}；不支持将该字符用作用户标识和密码的首字符
+        // 问号 {?}
+        // 左方括号 {[}
+        // 右方括号 {]}
+        // 下划线 {_}；这是中唯一受支持的特殊字符
+        // 重音符 {`}
+        // 波浪号｛~｝
+        // 分号 {;}
+        // 冒号 {:}
+
         UI_GenericInput* input = new UI_GenericInput(
             title, 121, screen, dictionary, [](char* result) {
                 Serial.println("Saving");
@@ -184,7 +202,7 @@ void init_builders() {
     };
     screen_builders[1221] = [] {
         static char title[] = "Server IP";
-        static char dictionary[] = "1234567890.";
+        static char dictionary[] = "01234567890.";
         char* ip_r = IPConstructor(config.serverIP);
         UI_GenericInput* input = new UI_GenericInput(
             title, 122, screen, dictionary, [](char* result) {
@@ -210,7 +228,7 @@ void init_builders() {
     };
     screen_builders[1222] = [] {
         static char title[] = "Server Port";
-        static char dictionary[] = "1234567890";
+        static char dictionary[] = "0123456789";
         char* ip_r = PortConstructor(config.serverPort);
         UI_GenericInput* input = new UI_GenericInput(
             title, 122, screen, dictionary, [](char* result) {
@@ -242,7 +260,7 @@ void init_builders() {
         static char title[] = "IP Manual Set";
         static char selection1[] = "IP Address";
         static char selection2[] = "Subnet Mask";
-        static char selection3[] = "Gateway(Router)";
+        static char selection3[] = "Gateway (Router)";
         static char selection4[] = "DNS Server";
         static UI_GenericMenu_Selection* selections = GM_make_selections(4, GM_make_selection(selection1, false, 1241), GM_make_selection(selection2, false, 1242), GM_make_selection(selection3, false, 1243), GM_make_selection(selection4, false, 1244));
         UI_GenericMenu* menu = new UI_GenericMenu(title, 12, screen, selections, 4, 124);
@@ -256,7 +274,7 @@ void init_builders() {
     };
     screen_builders[1241] = [] {
         static char title[] = "IP Address";
-        static char dictionary[] = "1234567890.";
+        static char dictionary[] = "01234567890.";
         char* ip_r = IPConstructor(config.serverIP);
         UI_GenericInput* input = new UI_GenericInput(
             title, 124, screen, dictionary, [](char* result) {
@@ -282,7 +300,7 @@ void init_builders() {
     };
     screen_builders[1242] = [] {
         static char title[] = "Subnet Mask";
-        static char dictionary[] = "1234567890.";
+        static char dictionary[] = "0123456789.";
         char* ip_r = IPConstructor(config.serverIP);
         UI_GenericInput* input = new UI_GenericInput(
             title, 124, screen, dictionary, [](char* result) {
@@ -308,7 +326,7 @@ void init_builders() {
     };
     screen_builders[1243] = [] {
         static char title[] = "Gateway";
-        static char dictionary[] = "1234567890.";
+        static char dictionary[] = "0123456789.";
         char* ip_r = IPConstructor(config.serverIP);
         UI_GenericInput* input = new UI_GenericInput(
             title, 124, screen, dictionary, [](char* result) {
@@ -334,7 +352,7 @@ void init_builders() {
     };
     screen_builders[1244] = [] {
         static char title[] = "DNS Server";
-        static char dictionary[] = "1234567890.";
+        static char dictionary[] = "0123456789.";
         char* ip_r = IPConstructor(config.serverIP);
         UI_GenericInput* input = new UI_GenericInput(
             title, 124, screen, dictionary, [](char* result) {
@@ -360,7 +378,7 @@ void init_builders() {
     };
     screen_builders[13] = [] {
         static char title[] = "Network ID";
-        static char dictionary[] = "1234567890";
+        static char dictionary[] = "0123456789";
         UI_GenericInput* input = new UI_GenericInput(
             title, 1, screen, dictionary, [](char* result) {
                 Serial.println("Saving");

@@ -18,7 +18,7 @@ char* ui_main_args::getSignalTypeString() {
         case 0:
             return "CAN";
         case 1:
-            return "WiFi";
+            return "Wi-Fi";
         case 2:
             return "LoRa";
         default:

@@ -94,6 +94,9 @@ UI_GenericMenu::UI_GenericMenu(char* title, unsigned int _parent, unsigned int& 
     lv_style_init(style_title);
     lv_style_set_text_color(style_title, lv_color_white());
     lv_style_set_text_font(style_title, &siyuan12);
+    lv_style_set_border_color(style_title, lv_color_white());
+    lv_style_set_border_side(style_title, LV_BORDER_SIDE_BOTTOM);
+    lv_style_set_border_width(style_title, 1);
 
     style_plain = new lv_style_t();
     lv_style_init(style_plain);
