@@ -17,4 +17,6 @@
 #define KEY_C1_PIN 46
 #define KEY_C2_PIN 9
 
+#define VOLTAGE_PIN 1
+
 #endif  // PIN_DEFS_H

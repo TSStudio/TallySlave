@@ -9,7 +9,6 @@
 #include "../network/utils/ipvalidator.h"
 #include "../network/wifi/wifi.h"
 
-#include "conmenu/conmenu.h"
 #include <map>
 
 //0: Main, 1:ConMenu, 11:ConMenu-SelectInterface, 21:ConMenu-WifiSettings, 31:ConMenu-NetworkID
@@ -23,6 +22,7 @@ struct screen_co {
     unsigned int type;
     void refresh();
     void* ui_obj_ptr;
+    ~screen_co() = default;
 };
 
 void refresh_screen();

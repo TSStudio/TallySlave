@@ -4,7 +4,6 @@
 #include <TFT_eSPI.h>  // Graphics and font library for ST7735 driver chip
 #include <SPI.h>
 #include "screen/screen_port.h"
-#include "ui/ui_all.h"
 #include "network/wifi/wifi.h"
 #include "config/config.h"
 #include "keys/keys.h"
@@ -22,14 +21,16 @@ unsigned long cycle0 = 0, cycle1 = 0;
 
 ui_main_ui_entry* ui_main;
 
-UI_GenericMenu ui_conmenu;
-
-TaskHandle_t obstructIOsTaskHandle, nonObstructIOsTaskHandle;
+TaskHandle_t obstructIOsTaskHandle, nonObstructIOsTaskHandle, keyIOsTaskHandle;
 
 void obstructIOs(void* parameter) {
     Serial.print("ObstructIO running on core ");
     Serial.println(xPortGetCoreID());
     for (;;) {
+        // if (cycle0 % 30000 == 10) {
+        //     int voltage = analogRead(VOLTAGE_PIN);
+        //     ui_main->args->voltage = voltage * 1.1 * 21 / 4095;
+        // }
         if (cycle0 % 3000 == 0) {
             if (config.interface_type == 1) {
                 doWifiStuff(ui_main->args->signaldBm, ui_main->args->preview_device_id, ui_main->args->program_device_id, ui_main->args->signalState, config.networkID);
@@ -66,6 +67,11 @@ void nonObstructIOs(void* parameter) {
             last_refresh_time_us = micros();
             refresh_screen();
         }
+    }
+}
+
+void keyIOs(void* parameter) {
+    for (;;) {
         do_key_stuff();
     }
 }
@@ -97,14 +103,6 @@ void setup() {
 
     //ui_main->args->signalType = config.interface_type;
 
-    ui_conmenu = setup_ui_conmenu_screen(screen);
-    screen_conmenu.screen_obj = ui_conmenu.scr;
-    screen_conmenu.refresh_handle_t0 = ui_generic_menu_handle_update;
-    screen_conmenu.refresh_handle_t1 = NULL;
-    screen_conmenu.type = 0;
-    screen_conmenu.ui_obj_ptr = &ui_conmenu;
-    screens[1] = screen_conmenu;
-
     init_builders();
 
     xTaskCreatePinnedToCore(
@@ -123,6 +121,15 @@ void setup() {
         NULL,
         1,
         &nonObstructIOsTaskHandle,
+        1);
+    delay(100);
+    xTaskCreatePinnedToCore(
+        keyIOs,
+        "Key IO",
+        2000,
+        NULL,
+        1,
+        &keyIOsTaskHandle,
         1);
 }
 

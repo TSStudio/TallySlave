@@ -1,0 +1,6 @@
+lvgl/lvgl@^9.1.0
+EEPROM
+SPI
+jgromes/RadioLib@^6.4.2
+Wire
+bodmer/TFT_eSPI@^2.5.43

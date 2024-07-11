@@ -23,15 +23,11 @@ void key_1_down() {
     if (current_screen == 0) {
         Serial.println("Making screen 1");
         screen = 1;
-    } else if (current_screen == 1) {
-        Serial.println("Making screen 0");
-        screen = 0;
     } else {
         if (screens[current_screen].type == 0)
             ((UI_GenericMenu*)(screens[current_screen].ui_obj_ptr))->handleBack();
         if (screens[current_screen].type == 2)
             ((UI_GenericInput*)(screens[current_screen].ui_obj_ptr))->handleSaveInternal();
-        screens.erase(current_screen);
     }
 }
 void key_2_down() {

@@ -7,6 +7,8 @@
 
 struct UI_GenericInput {
     lv_obj_t *scr, *label_title, *label_editing;
+    lv_style_t *screen_style, *style_title, *style_plain, *style_selected;
+    unsigned int id;
     unsigned int parent;
     char* currentEditing;
     char* dictionary;
@@ -21,7 +23,10 @@ struct UI_GenericInput {
     void handleLeft();
     void handleRight();
     void handleSelectionChange(int delta = 0);
+
+    UI_GenericInput(char* title, unsigned int _parent, unsigned int& _screen_in_display, char* _dictionary, void (*_handleSave)(char* result), int _maxLength, char* _initfrom, bool _fixedLength, unsigned int _id);
+
+    ~UI_GenericInput();
 };
 void ui_generic_input_handle_update(UI_GenericInput* input);
-UI_GenericInput GI_make_input(char* title, unsigned int parent, unsigned int& screen_in_display, char* dictionary, void (*handleSave)(char* result), int maxLength, char* initfrom, bool fixedLength = false);
 #endif

@@ -20,4 +20,6 @@
 #define KEY_ENC_A_PIN 8
 #define KEY_ENC_B_PIN 19
 
+#define VOLTAGE_PIN 1
+
 #endif  // PIN_DEFS_H
